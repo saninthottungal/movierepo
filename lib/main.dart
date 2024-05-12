@@ -74,12 +74,45 @@ class FilmListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: ListView.builder(
-        itemBuilder: (context, index) {
-          return ListTile(title: Text("Data"));
-        },
-        itemCount: 10,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: ListView.builder(
+          itemBuilder: (context, index) {
+            return ListTile(
+              title: Text(films[index].title),
+              subtitle: Text(films[index].subtitle),
+            );
+          },
+          itemCount: 10,
+        ),
       ),
     );
   }
 }
+
+class Film {
+  final int id;
+  final String title;
+  final String subtitle;
+  bool isFavorite;
+
+  Film({
+    required this.id,
+    required this.title,
+    required this.subtitle,
+    this.isFavorite = false,
+  });
+}
+
+final List<Film> films = [
+  Film(id: 1, title: "Aavesham", subtitle: "Jithu Madhavan"),
+  Film(id: 2, title: "Manjummel Boys", subtitle: "Chidambaram"),
+  Film(id: 3, title: "Premalu", subtitle: "Gireesh A.D"),
+  Film(id: 4, title: "Goat Life", subtitle: "Blessy"),
+  Film(id: 5, title: "Varshangalkku Shesham", subtitle: "Vineeth Sreenivasan"),
+  Film(id: 6, title: "Turbo", subtitle: "Vyshak"),
+  Film(id: 7, title: "Barroz", subtitle: "Mohanlal"),
+  Film(id: 8, title: "Lucifer", subtitle: "Pritviraj Sukumaran"),
+  Film(id: 9, title: "Kaathal:The Core", subtitle: "Geo Baby"),
+  Film(id: 10, title: "Minnal Murali", subtitle: "Basil Joseph"),
+];
