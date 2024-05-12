@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
   runApp(
-    const MyApp(),
+    const ProviderScope(
+      child: MyApp(),
+    ),
   );
 }
 
@@ -42,13 +45,14 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
-class CustomDropDown extends StatelessWidget {
+class CustomDropDown extends ConsumerWidget {
   const CustomDropDown({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentStatus = ref.watch(favoriteStatusProvider);
     return DropdownButton(
-      value: FavoriteStatus.all,
+      value: currentStatus,
       items: FavoriteStatus.values
           .map(
             (value) => DropdownMenuItem(
@@ -57,30 +61,43 @@ class CustomDropDown extends StatelessWidget {
             ),
           )
           .toList(),
-      onChanged: (value) {},
+      onChanged: (value) {
+        ref.read(favoriteStatusProvider.notifier).state =
+            value ?? FavoriteStatus.all;
+      },
     );
   }
 }
 
+//enum favorite status
 enum FavoriteStatus {
   all,
   favorites,
   nonFavorites,
 }
 
-class FilmListWidget extends StatelessWidget {
+//listview widget
+class FilmListWidget extends ConsumerWidget {
   const FilmListWidget({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final items = ref.watch(filmProvider);
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
         child: ListView.builder(
           itemBuilder: (context, index) {
+            final isFavorite = items[index].isFavorite;
             return ListTile(
-              title: Text(films[index].title),
-              subtitle: Text(films[index].subtitle),
+              title: Text(items[index].title),
+              subtitle: Text(items[index].subtitle),
+              trailing: IconButton(
+                icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
+                onPressed: () {
+                  ref.read(filmProvider.notifier).favorite(items[index]);
+                },
+              ),
             );
           },
           itemCount: 10,
@@ -90,6 +107,7 @@ class FilmListWidget extends StatelessWidget {
   }
 }
 
+//film Model
 class Film {
   final int id;
   final String title;
@@ -104,6 +122,7 @@ class Film {
   });
 }
 
+//list of movies
 final List<Film> films = [
   Film(id: 1, title: "Aavesham", subtitle: "Jithu Madhavan"),
   Film(id: 2, title: "Manjummel Boys", subtitle: "Chidambaram"),
@@ -116,3 +135,31 @@ final List<Film> films = [
   Film(id: 9, title: "Kaathal:The Core", subtitle: "Geo Baby"),
   Film(id: 10, title: "Minnal Murali", subtitle: "Basil Joseph"),
 ];
+
+//stateNotifer class
+class FilmListProvider extends StateNotifier<List<Film>> {
+  FilmListProvider() : super(films);
+
+  void favorite(Film film) {
+    state = state.map((element) {
+      if (element.id == film.id) {
+        element.isFavorite = !element.isFavorite;
+        return element;
+      } else {
+        return element;
+      }
+    }).toList();
+  }
+}
+
+//filmListProvider
+
+final filmProvider = StateNotifierProvider<FilmListProvider, List<Film>>(
+  (ref) => FilmListProvider(),
+);
+
+//favoriteStatusProvider
+
+final favoriteStatusProvider = StateProvider<FavoriteStatus>(
+  (ref) => FavoriteStatus.all,
+);
