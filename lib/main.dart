@@ -82,7 +82,16 @@ class FilmListWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final items = ref.watch(filmProvider);
+    List<Film> items = ref.watch(filmProvider);
+    final currentStatus = ref.watch(favoriteStatusProvider);
+    if (currentStatus == FavoriteStatus.favorites) {
+      items = items.where((element) => element.isFavorite == true).toList();
+    } else if (currentStatus == FavoriteStatus.nonFavorites) {
+      items = items.where((element) => element.isFavorite == false).toList();
+    } else {
+      items = ref.read(filmProvider);
+    }
+
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -100,7 +109,7 @@ class FilmListWidget extends ConsumerWidget {
               ),
             );
           },
-          itemCount: 10,
+          itemCount: items.length,
         ),
       ),
     );
