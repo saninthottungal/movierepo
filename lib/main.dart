@@ -35,7 +35,7 @@ class MyHomePage extends StatelessWidget {
       body: const Column(
         children: [
           CustomDropDown(),
-          Text("data"),
+          FilmListWidget(),
         ],
       ),
     );
@@ -66,4 +66,20 @@ enum FavoriteStatus {
   all,
   favorites,
   nonFavorites,
+}
+
+class FilmListWidget extends StatelessWidget {
+  const FilmListWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: ListView.builder(
+        itemBuilder: (context, index) {
+          return ListTile(title: Text("Data"));
+        },
+        itemCount: 10,
+      ),
+    );
+  }
 }
